@@ -411,7 +411,7 @@ curl -X POST "http://localhost:3000/api/v1/books" \
 
 ### Common Issues
 
-#### 1. "Error: P1001: Can't reach database server"
+#### 1."Error: P1001: Can't reach database server"
 
 **Solution:**
 - Make sure PostgreSQL is running
@@ -419,21 +419,21 @@ curl -X POST "http://localhost:3000/api/v1/books" \
 - Verify database credentials are correct
 - Ensure the database exists
 
-#### 2. "Error: Prisma client could not be generated"
+#### 2."Error: Prisma client could not be generated"
 
 **Solution:**
 ```bash
 npx prisma generate
 ```
 
-#### 3. "Error: There are pending migrations"
+#### 3."Error: There are pending migrations"
 
 **Solution:**
 ```bash
 npx prisma migrate dev
 ```
 
-#### 4. "Port 3000 is already in use"
+#### 4."Port 3000 is already in use"
 
 **Solution:**
 - Kill the process using port 3000, or
@@ -483,23 +483,23 @@ PORT=3000
 ```
 book-library-api/
 ├── src/
-│   ├── app.ts                 # Main application file
+│   ├── app.ts  #Main application file
 │   ├── lib/
-│   │   └── prisma.ts          # Prisma client configuration
+│   │   └── prisma.ts  #Prisma client configuration
 │   ├── middlewares/
 │   │   └── error.middleware.ts # Error handling middleware
-│   ├── models/                # TypeScript interfaces
+│   ├── models/ # TypeScript interfaces
 │   ├── routes/
 │   │   └── books.routes.ts    # API routes
-│   ├── validators/            # Zod validation schemas
-│   └── data/                  # Mock data (for reference)
+│   ├── validators/      #Zod validation schemas
+│   └── data/     # Mock data (for reference)
 ├── prisma/
-│   ├── schema.prisma          # Database schema
-│   ├── seed.ts                # Database seeding script
-│   └── migrations/            # Database migrations
-├── .env.example               # Environment variables template
-├── package.json               # Dependencies and scripts
-└── README.md                  # This file
+│   ├── schema.prisma    # Database schema
+│   ├── seed.ts    #Database seeding script
+│   └── migrations/        # Database migrations
+├── .env.example       # Environment variables template
+├── package.json      # Dependencies and scripts
+└── README.md     # This file
 ```
 
 ## Scripts
@@ -531,6 +531,14 @@ book-library-api/
 
 During development, AI tools were used for guidance, debugging, and understanding concepts.
 
+- setting up Express + TypeScript project
+- generating CRUD endpoints for Books
+- implementing Reviews and average rating logic
+- adding filtering, sorting and pagination
+- implementing validation using Zod
+- setting up Prisma ORM and PostgreSQL
+- debugging routing and runtime errors
+
 Prisma and database:
 - How to configure Prisma with PostgreSQL using environment variables
 - Fix Prisma error multiple datasources defined
@@ -556,6 +564,7 @@ Testing:
 - How to test REST API endpoints using Thunder Client
 - What is the correct format for query parameters in Express
 
+
 ## Notes
 
 AI was used only as a support tool for understanding, debugging, and improving the code.
@@ -563,12 +572,12 @@ All implementation and testing were done independently.
 
 ## Project Status
 
-✅ **Core API functionality implemented**  
-✅ **Database integration with Prisma completed**  
-✅ **Validation and error handling implemented**  
-✅ **API tested and working**  
-✅ **Documentation complete**  
-✅ **Ready for deployment**
+ **Core API functionality implemented**  
+ **Database integration with Prisma completed**  
+ **Validation and error handling implemented**  
+ **API tested and working**  
+ **Documentation complete**  
+ **Ready for deployment**
 
 ## Author
 
