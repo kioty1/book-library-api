@@ -159,8 +159,8 @@ curl -X POST "http://localhost:3000/api/v1/books/1/reviews" \
   -H "Content-Type: application/json" \
   -d '{
     "userName": "Milana",
-    "rating": 5,
-    "comment": "Very good book!"
+    "rating": 2,
+    "comment": "Очень сложно!"
   }'
 ```
 
@@ -315,4 +315,4 @@ API tested using Thunder Client
 
 ## Author
 
-Milana Koloskova
+Maksim Ljubimov
