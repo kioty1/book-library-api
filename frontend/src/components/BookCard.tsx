@@ -8,7 +8,7 @@ type Props = {
 
 function BookCard({ book, onDelete }: Props) {
   return (
-    <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "12px" }}>
+    <div className="card">
       <h2>{book.title}</h2>
 
       <p>Language: {book.language}</p>
@@ -18,14 +18,20 @@ function BookCard({ book, onDelete }: Props) {
         <button>Vaata</button>
       </Link>
 
- <button
+<button
   style={{ marginLeft: "10px" }}
-  onClick={() => onDelete(book.id)}
+  onClick={() => {
+    if (window.confirm("Delete this book?")) {
+      onDelete(book.id);
+    }
+  }}
 >
   Kustuta
 </button>
     </div>
   );
 }
+
+
 
 export default BookCard;

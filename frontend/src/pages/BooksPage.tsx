@@ -17,8 +17,10 @@ function BooksPage() {
   const [language, setLanguage] = useState("");
   const [sortBy, setSortBy] = useState("title");
   const [order, setOrder] = useState("asc");
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,6 +60,12 @@ function BooksPage() {
   };
 
   const handleDelete = (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this book?"
+    );
+
+    if (!confirmed) return;
+
     deleteBook(id)
       .then(() => {
         loadBooks(page);
@@ -68,12 +76,9 @@ function BooksPage() {
   };
 
   return (
-    <div style={{ padding: "30px", background: "white", color: "black" }}>
+    <div>
       <h1>Books</h1>
 
-      <Link to="/books/new">
-        <button>Lisa raamat</button>
-      </Link>
 
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
         <input
@@ -147,11 +152,11 @@ function BooksPage() {
 
       {loading && <p>Loading...</p>}
 
-      {error && (
-        <p style={{ color: "red" }}>
-          {error}
-        </p>
-      )}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {!loading && books.length === 0 && (
+  <p>No books found.</p>
+)}
 
       {!loading &&
         books.map((book) => (

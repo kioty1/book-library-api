@@ -1,107 +1,197 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
-    getBookById, getBookReviews, getAverageRating,
-    type Book,
-    type Review,
+  getBookById,
+  getBookReviews,
+  getAverageRating,
+  createReview,
+  type Book,
+  type Review,
 } from "../api";
 
 function BookDetailPage() {
-    const { id } = useParams();
-    const [book, setBook] = useState<Book | null>(null);
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [averageRating, setAverageRating] = useState<number>(0);
+  const { id } = useParams();
 
-    useEffect(() => {
-        if (!id) return;
+  const [book, setBook] = useState<Book | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
 
-        getBookById(id)
-            .then((data) => {
-                setBook(data);
-            })
-            .catch((error) => {
-                console.error("Book error:", error);
-            });
+  const [userName, setUserName] = useState("");
+  const [rating, setRating] = useState("5");
+  const [comment, setComment] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
-        getBookReviews(id)
-            .then((data) => {
-                setReviews(data ?? []);
-            })
-            .catch((error) => {
-                console.error("Reviews error:", error);
-            });
+  const loadReviews = (bookId: string) => {
+    getBookReviews(bookId)
+      .then((data) => {
+        setReviews(data ?? []);
+      })
+      .catch((error) => {
+        console.error("Reviews error:", error);
+      });
 
-        getAverageRating(id)
-            .then((data) => {
-                setAverageRating(data);
-            })
-            .catch((error) => {
-                console.error("Average rating error:", error);
-            });
-    }, [id]);
+    getAverageRating(bookId)
+      .then((data) => {
+        setAverageRating(data);
+      })
+      .catch((error) => {
+        console.error("Average rating error:", error);
+      });
+  };
 
-    if (!book) {
-        return <p style={{ padding: "30px" }}>Loading...</p>;
-    }
+  useEffect(() => {
+    if (!id) return;
 
-    return (
-        <div style={{ padding: "30px", background: "white", color: "black" }}>
-            <h1>{book.title}</h1>
+    getBookById(id)
+      .then((data) => {
+        setBook(data);
+      })
+      .catch((error) => {
+        console.error("Book error:", error);
+      });
 
-            <p><strong>ID:</strong> {book.id}</p>
-            <p><strong>ISBN:</strong> {book.isbn}</p>
-            <p><strong>Year:</strong> {book.publishedYear}</p>
-            <p><strong>Language:</strong> {book.language}</p>
-            <p><strong>Pages:</strong> {book.pageCount}</p>
+    loadReviews(id);
+  }, [id]);
 
-            <p><strong>Description:</strong></p>
-            <p>{book.description}</p>
+  const handleReviewSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
 
-            <p>
-                <strong>Author:</strong> {book.author?.firstName} {book.author?.lastName}
-            </p>
+    if (!id) return;
 
-            <p>
-                <strong>Publisher:</strong> {book.publisher?.name}
-            </p>
+    setReviewError("");
 
-            <p>
-                <strong>Genres:</strong> {book.genres?.map((g) => g.name).join(", ")}
-            </p>
+    createReview(id, {
+      userName,
+      rating: Number(rating),
+      comment,
+    })
+      .then(() => {
+        setUserName("");
+        setRating("5");
+        setComment("");
+        loadReviews(id);
+      })
+      .catch((error) => {
+        console.error("Create review error:", error);
 
-            <h2>Average rating</h2>
-            <p>{averageRating} / 5</p>
+        if (error.response?.data?.error) {
+          setReviewError(error.response.data.error);
+        } else {
+          setReviewError("Failed to add review");
+        }
+      });
+  };
 
-            <h2>Reviews</h2>
+  if (!book) {
+    return <p>Loading...</p>;
+  }
 
-            {reviews.length === 0 ? (
-                <p>No reviews yet.</p>
-            ) : (
-                reviews.map((review) => (
-                    <div
-                        key={review.id}
-                        style={{
-                            border: "1px solid #ccc",
-                            padding: "10px",
-                            marginBottom: "10px",
-                        }}
-                    >
-                        <p><strong>User:</strong> {review.userName}</p>
-                        <p><strong>Rating:</strong> {review.rating}/5</p>
-                        <p>{review.comment}</p>
-                    </div>
-                ))
-            )}
+  return (
+    <div>
+      <h1>{book.title}</h1>
 
-            <Link to={`/books/${book.id}/edit`}>
-                <button>Muuda</button>
-            </Link>
+      <div className="card">
+        <p><strong>ID:</strong> {book.id}</p>
+        <p><strong>ISBN:</strong> {book.isbn}</p>
+        <p><strong>Year:</strong> {book.publishedYear}</p>
+        <p><strong>Language:</strong> {book.language}</p>
+        <p><strong>Pages:</strong> {book.pageCount}</p>
 
-            <Link to="/books">
-                <button>Tagasi nimekirja</button>
-            </Link>
-        </div>
-    );
+        <p><strong>Description:</strong></p>
+        <p>{book.description}</p>
+
+        <p>
+          <strong>Author:</strong>{" "}
+          {book.author?.firstName} {book.author?.lastName}
+        </p>
+
+        <p>
+          <strong>Publisher:</strong> {book.publisher?.name}
+        </p>
+
+        <p>
+          <strong>Genres:</strong>{" "}
+          {book.genres?.map((g) => g.name).join(", ")}
+        </p>
+      </div>
+
+      <div className="card">
+        <h2>Average rating</h2>
+        <p>{averageRating} / 5</p>
+      </div>
+
+      <div className="card">
+        <h2>Add review</h2>
+
+        <form onSubmit={handleReviewSubmit}>
+          <div>
+            <label>User name</label>
+            <br />
+            <input
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <label>Rating</label>
+            <br />
+            <select
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <label>Comment</label>
+            <br />
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </div>
+
+          {reviewError && (
+            <p style={{ color: "red" }}>{reviewError}</p>
+          )}
+
+          <button type="submit" style={{ marginTop: "10px" }}>
+            Lisa arvustus
+          </button>
+        </form>
+      </div>
+
+      <h2>Reviews</h2>
+
+      {reviews.length === 0 ? (
+        <p>No reviews yet.</p>
+      ) : (
+        reviews.map((review) => (
+          <div key={review.id} className="card">
+            <p><strong>User:</strong> {review.userName}</p>
+            <p><strong>Rating:</strong> {review.rating}/5</p>
+            <p>{review.comment}</p>
+          </div>
+        ))
+      )}
+
+      <Link to={`/books/${book.id}/edit`}>
+        <button>Muuda</button>
+      </Link>
+
+      <Link to="/books">
+        <button>Tagasi nimekirja</button>
+      </Link>
+    </div>
+  );
 }
 
 export default BookDetailPage;

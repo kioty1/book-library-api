@@ -134,3 +134,17 @@ export const updateBook = async (
 export const deleteBook = async (id: string): Promise<void> => {
   await API.delete(`/books/${id}`);
 };
+
+export interface CreateReviewData {
+  userName: string;
+  rating: number;
+  comment: string;
+}
+
+export const createReview = async (
+  bookId: string,
+  reviewData: CreateReviewData
+): Promise<Review> => {
+  const response = await API.post(`/books/${bookId}/reviews`, reviewData);
+  return response.data.data;
+};
