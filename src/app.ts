@@ -1,9 +1,12 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import booksRoutes from './routes/books.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 const PORT = 3000;
+
+app.use(cors());
 
 app.use(express.json());
 

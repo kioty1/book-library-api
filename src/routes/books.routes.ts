@@ -7,7 +7,7 @@ import { ZodIssue } from "zod";
 const router = Router();
 
 const getStringParam = (value: string | string[] | undefined): string | undefined => {
-  if (typeof value === 'string') return value;
+  if (typeof value === "string") return value;
   if (Array.isArray(value)) return value[0];
   return undefined;
 };
@@ -96,9 +96,86 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/:bookId/reviews", async (req: Request, res: Response) => {
+  try {
+    const bookId = getStringParam(req.params.bookId);
+
+    if (!bookId) {
+      return res.status(400).json({ error: "Book id is required" });
+    }
+
+    const bookExists = await prisma.book.findUnique({
+      where: { id: bookId },
+    });
+
+    if (!bookExists) {
+      return res.status(404).json({
+        error: "Book not found",
+      });
+    }
+
+    const reviews = await prisma.review.findMany({
+      where: { bookId },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.status(200).json({
+      data: reviews,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
+router.get("/:id/average-rating", async (req: Request, res: Response) => {
+  try {
+    const id = getStringParam(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ error: "Book id is required" });
+    }
+
+    const bookExists = await prisma.book.findUnique({
+      where: { id },
+    });
+
+    if (!bookExists) {
+      return res.status(404).json({
+        error: "Book not found",
+      });
+    }
+
+    const result = await prisma.review.aggregate({
+      where: {
+        bookId: id,
+      },
+      _avg: {
+        rating: true,
+      },
+    });
+
+    return res.status(200).json({
+      data: {
+        averageRating: result._avg.rating ?? 0,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const id = getStringParam(req.params.id);
+
     if (!id) {
       return res.status(400).json({ error: "Book id is required" });
     }
@@ -254,6 +331,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.post("/:bookId/reviews", async (req: Request, res: Response) => {
   try {
     const bookId = getStringParam(req.params.bookId);
+
     if (!bookId) {
       return res.status(400).json({ error: "Book id is required" });
     }
@@ -303,6 +381,7 @@ router.post("/:bookId/reviews", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     const id = getStringParam(req.params.id);
+
     if (!id) {
       return res.status(400).json({ error: "Book id is required" });
     }
@@ -391,6 +470,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     const id = getStringParam(req.params.id);
+
     if (!id) {
       return res.status(400).json({ error: "Book id is required" });
     }
@@ -411,78 +491,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
     return res.status(200).json({
       data: deletedBook,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      error: "Internal server error",
-    });
-  }
-});
-
-router.get("/:bookId/reviews", async (req: Request, res: Response) => {
-  try {
-    const bookId = getStringParam(req.params.bookId);
-    if (!bookId) {
-      return res.status(400).json({ error: "Book id is required" });
-    }
-
-    const bookExists = await prisma.book.findUnique({
-      where: { id: bookId },
-    });
-
-    if (!bookExists) {
-      return res.status(404).json({
-        error: "Book not found",
-      });
-    }
-
-    const bookReviews = await prisma.review.findMany({
-      where: { bookId },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return res.status(200).json({
-      data: bookReviews,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      error: "Internal server error",
-    });
-  }
-});
-
-router.get("/:id/average-rating", async (req: Request, res: Response) => {
-  try {
-    const id = getStringParam(req.params.id);
-    if (!id) {
-      return res.status(400).json({ error: "Book id is required" });
-    }
-
-    const bookExists = await prisma.book.findUnique({
-      where: { id },
-    });
-
-    if (!bookExists) {
-      return res.status(404).json({
-        error: "Book not found",
-      });
-    }
-
-    const result = await prisma.review.aggregate({
-      where: {
-        bookId: id,
-      },
-      _avg: {
-        rating: true,
-      },
-    });
-
-    return res.status(200).json({
-      averageRating: result._avg?.rating ?? 0,
     });
   } catch (error) {
     console.error(error);
