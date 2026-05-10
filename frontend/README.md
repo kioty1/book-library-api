@@ -1,73 +1,200 @@
-# React + TypeScript + Vite
+# Book Library Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend application for the Book Library project.
 
-Currently, two official plugins are available:
+The application provides a user interface for managing books, reviews, ratings, filtering, sorting, and pagination.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Built using React, TypeScript, Vite, React Router, and Axios.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- View all books
+- Search books by title
+- Filter books by language and year
+- Sort books by title or year
+- Pagination support
+- View detailed information about a book
+- Add new books
+- Edit existing books
+- Delete books
+- Add reviews and ratings
+- Display average rating
+- Responsive and modern UI
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React
+- TypeScript
+- Vite
+- React Router DOM
+- Axios
+- CSS
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Prerequisites
+
+Before running the frontend project, make sure you have installed:
+
+- Node.js (version 18 or higher)
+- npm
+
+Verify installation:
+
+```bash
+node --version
+npm --version
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Setup Instructions
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Open the project folder:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
 ```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start development server:
+
+```bash
+npm run dev
+```
+
+The frontend will run on:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Backend Connection
+
+The frontend communicates with the backend REST API.
+
+Make sure the backend server is running before starting the frontend.
+
+The frontend uses the environment variable `VITE_API_URL` to configure the base API URL.
+
+Example `.env` entry:
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+---
+
+## Pages
+
+### Books Page
+- Display all books
+- Search by title
+- Filter by language and year
+- Sort by title or year
+- Pagination
+- Navigate to book details
+
+### Book Details Page
+- Full book information
+- Reviews list
+- Average rating
+- Add review form
+
+### Add Book Page
+- Create a new book
+
+### Edit Book Page
+- Update existing book
+
+---
+
+## Project Structure
+
+```text
+frontend/
+├── src/
+│   ├── api.ts
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   └── BookCard.tsx
+│   ├── pages/
+│   │   ├── BooksPage.tsx
+│   │   ├── BookDetailPage.tsx
+│   │   ├── AddBookPage.tsx
+│   │   └── EditBookPage.tsx
+│   └── index.css
+├── package.json
+└── README.md
+```
+
+---
+
+## Backend Endpoints Used
+
+- `GET /books`
+- `GET /books/:id`
+- `POST /books`
+- `PUT /books/:id`
+- `DELETE /books/:id`
+- `POST /books/:bookId/reviews`
+- `GET /books/:bookId/reviews`
+- `GET /books/:bookId/average-rating`
+---
+
+## UI Highlights
+
+- Reusable book cards
+- Navbar navigation
+- Styled buttons and forms
+- Responsive layout
+- Card-based design
+- Loading and error states
+
+---
+
+## AI Usage
+
+AI tools were used during development for:
+
+- React component structure
+- Debugging TypeScript errors
+- Styling improvements
+- Pagination logic
+- Filtering and sorting logic
+- Axios integration
+- React Router configuration
+
+AI was used only as a support tool.
+---
+
+## Screenshots
+
+![Main Books Page](./screenshots/MainBooksPage.png)
+![Book Details Page](./screenshots/BookDetailsPage.png)
+![AddBookPage](./screenshots/AddBookPage.png)
+![ReviewsSection](./screenshots/ReviewsSection.png)
+![EditBookPage](./screenshots/EditBookPage.png)
+---
+
+## Notes
+
+- The frontend currently relies on the backend running at the configured `VITE_API_URL`.
+- Search and filtering are handled through the `/books` endpoint.
+
+---
+
+## Author
+
+Maksim Ljubimov

@@ -48,7 +48,7 @@ psql --version    # Should show PostgreSQL version
 
 ## Setup Instructions
 
-## Quick Start (for experienced users)
+### Quick Start (for experienced users)
 
 If you have Node.js and PostgreSQL already set up:
 
@@ -93,8 +93,15 @@ cp .env.example .env
 Edit the `.env` file and update the `DATABASE_URL`:
 
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/book_library"
+DATABASE_URL="postgresql://username:password@localhost:5432/book_library?schema=public"
+
 ```
+Or use a remote PostgreSQL server:
+
+```env
+DATABASE_URL="postgresql://username:password@host:5432/database_name?schema=public"
+```
+During development, a remote PostgreSQL server provided by the college was used.
 
 Replace:
 - `username` with your PostgreSQL username
@@ -151,7 +158,6 @@ npm run dev      # Start development server
 
 To stop the server, press `Ctrl+C` in the terminal.
 
-## API Endpoints
 
 ## API Endpoints
 
@@ -473,7 +479,7 @@ If you encounter database connection issues:
 
 Make sure your `.env` file contains:
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/database_name"
+DATABASE_URL="postgresql://username:password@localhost:5432/database_name?schema=public"
 NODE_ENV="development"
 PORT=3000
 ```
@@ -488,7 +494,6 @@ book-library-api/
 │   │   └── prisma.ts  #Prisma client configuration
 │   ├── middlewares/
 │   │   └── error.middleware.ts # Error handling middleware
-│   ├── models/ # TypeScript interfaces
 │   ├── routes/
 │   │   └── books.routes.ts    # API routes
 │   ├── validators/      #Zod validation schemas

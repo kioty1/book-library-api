@@ -21,36 +21,42 @@ function BookDetailPage() {
   const [comment, setComment] = useState("");
   const [reviewError, setReviewError] = useState("");
 
-  const loadReviews = (bookId: string) => {
-    getBookReviews(bookId)
-      .then((data) => {
-        setReviews(data ?? []);
-      })
-      .catch((error) => {
-        console.error("Reviews error:", error);
-      });
-
-    getAverageRating(bookId)
-      .then((data) => {
-        setAverageRating(data);
-      })
-      .catch((error) => {
-        console.error("Average rating error:", error);
-      });
-  };
-
   useEffect(() => {
     if (!id) return;
 
-    getBookById(id)
+    const controller = new AbortController();
+
+    // Загружаем книгу
+    getBookById(id, { signal: controller.signal })
       .then((data) => {
         setBook(data);
       })
       .catch((error) => {
+        if (error.name === 'AbortError') return;
         console.error("Book error:", error);
       });
 
-    loadReviews(id);
+    // Загружаем отзывы
+    getBookReviews(id, { signal: controller.signal })
+      .then((data) => {
+        setReviews(data ?? []);
+      })
+      .catch((error) => {
+        if (error.name === 'AbortError') return;
+        console.error("Reviews error:", error);
+      });
+
+    // Загружаем средний рейтинг
+    getAverageRating(id, { signal: controller.signal })
+      .then((data) => {
+        setAverageRating(data);
+      })
+      .catch((error) => {
+        if (error.name === 'AbortError') return;
+        console.error("Average rating error:", error);
+      });
+
+    return () => controller.abort(); // Отмена всех запросов при размонтировании
   }, [id]);
 
   const handleReviewSubmit = (
@@ -71,7 +77,27 @@ function BookDetailPage() {
         setUserName("");
         setRating("5");
         setComment("");
-        loadReviews(id);
+
+        // Перезагружаем отзывы и рейтинг после добавления нового отзыва
+        const controller = new AbortController();
+
+        getBookReviews(id, { signal: controller.signal })
+          .then((data) => {
+            setReviews(data ?? []);
+          })
+          .catch((error) => {
+            if (error.name === 'AbortError') return;
+            console.error("Reviews reload error:", error);
+          });
+
+        getAverageRating(id, { signal: controller.signal })
+          .then((data) => {
+            setAverageRating(data);
+          })
+          .catch((error) => {
+            if (error.name === 'AbortError') return;
+            console.error("Average rating reload error:", error);
+          });
       })
       .catch((error) => {
         console.error("Create review error:", error);
@@ -90,7 +116,9 @@ function BookDetailPage() {
 
   return (
     <div>
-      <h1>{book.title}</h1>
+      <h1 className="text-4xl font-semibold text-slate-900 mb-6" style={{ color: "#111827" }}>
+        {book.title}
+      </h1>
 
       <div className="card">
         <p><strong>ID:</strong> {book.id}</p>

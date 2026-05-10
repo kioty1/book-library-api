@@ -77,38 +77,46 @@ export interface CreateBookData {
 }
 
 export const getBooks = async (
-  params: GetBooksParams = {}
+  params: GetBooksParams = {},
+  options?: { signal?: AbortSignal }
 ): Promise<BooksResponse> => {
   const response = await API.get("/books", {
     params: {
       ...params,
       t: Date.now(),
     },
+    signal: options?.signal,
   });
 
   return response.data;
 };
 
-export const getBookById = async (id: string): Promise<Book> => {
-  const response = await API.get(`/books/${id}?t=${Date.now()}`);
+export const getBookById = async (id: string, options?: { signal?: AbortSignal }): Promise<Book> => {
+  const response = await API.get(`/books/${id}?t=${Date.now()}`, {
+    signal: options?.signal,
+  });
   return response.data.data;
 };
 
 export const getBookReviews = async (
-  bookId: string
+  bookId: string,
+  options?: { signal?: AbortSignal }
 ): Promise<Review[]> => {
   const response = await API.get(
-    `/books/${bookId}/reviews?t=${Date.now()}`
+    `/books/${bookId}/reviews?t=${Date.now()}`,
+    { signal: options?.signal }
   );
 
   return response.data.data;
 };
 
 export const getAverageRating = async (
-  bookId: string
+  bookId: string,
+  options?: { signal?: AbortSignal }
 ): Promise<number> => {
   const response = await API.get(
-    `/books/${bookId}/average-rating?t=${Date.now()}`
+    `/books/${bookId}/average-rating?t=${Date.now()}`,
+    { signal: options?.signal }
   );
 
   return response.data.data.averageRating;
@@ -143,8 +151,11 @@ export interface CreateReviewData {
 
 export const createReview = async (
   bookId: string,
-  reviewData: CreateReviewData
+  reviewData: CreateReviewData,
+  options?: { signal?: AbortSignal }
 ): Promise<Review> => {
-  const response = await API.post(`/books/${bookId}/reviews`, reviewData);
+  const response = await API.post(`/books/${bookId}/reviews`, reviewData, {
+    signal: options?.signal,
+  });
   return response.data.data;
 };

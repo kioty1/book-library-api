@@ -1,5 +1,5 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   getBooks,
   deleteBook,
@@ -20,11 +20,14 @@ function BooksPage() {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
+  const [searchTrigger, setSearchTrigger] = useState(0);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const loadBooks = (pageNumber = page) => {
+  useEffect(() => {
+    const controller = new AbortController();
+
     setLoading(true);
     setError("");
 
@@ -34,29 +37,35 @@ function BooksPage() {
       language: language || undefined,
       sortBy,
       order,
-      page: pageNumber,
+      page,
       limit,
-    })
+    }, { signal: controller.signal })
       .then((response) => {
         setBooks(response.data ?? []);
         setPagination(response.pagination);
       })
       .catch((error) => {
+        if (
+          axios.isCancel(error) ||
+          error.name === "AbortError" ||
+          error.name === "CanceledError" ||
+          error.code === "ERR_CANCELED"
+        ) {
+          return; // Запрос был отменен
+        }
         console.error(error);
         setError("Failed to load books");
       })
       .finally(() => {
         setLoading(false);
       });
-  };
 
-  useEffect(() => {
-    loadBooks(page);
-  }, [page, limit]);
+    return () => controller.abort(); // Отмена запроса при размонтировании
+  }, [page, limit, searchTrigger]);
 
   const handleSearch = () => {
     setPage(1);
-    loadBooks(1);
+    setSearchTrigger((prev) => prev + 1);
   };
 
   const handleDelete = (id: string) => {
@@ -68,7 +77,40 @@ function BooksPage() {
 
     deleteBook(id)
       .then(() => {
-        loadBooks(page);
+        // Перезагрузим текущую страницу
+        const controller = new AbortController();
+
+        setLoading(true);
+        setError("");
+
+        getBooks({
+          title: title || undefined,
+          year: year || undefined,
+          language: language || undefined,
+          sortBy,
+          order,
+          page,
+          limit,
+        }, { signal: controller.signal })
+          .then((response) => {
+            setBooks(response.data ?? []);
+            setPagination(response.pagination);
+          })
+          .catch((error) => {
+            if (
+              axios.isCancel(error) ||
+              error.name === "AbortError" ||
+              error.name === "CanceledError" ||
+              error.code === "ERR_CANCELED"
+            ) {
+              return;
+            }
+            console.error("Delete error:", error);
+            setError("Failed to reload books after delete");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
       })
       .catch((error) => {
         console.error("Delete error:", error);
@@ -77,8 +119,7 @@ function BooksPage() {
 
   return (
     <div>
-      <h1>Books</h1>
-
+      <h1 style={{ color: "#111827" }}>Books</h1>
 
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
         <input
@@ -121,7 +162,9 @@ function BooksPage() {
           <option value={20}>20</option>
         </select>
 
-        <button onClick={handleSearch}>Search</button>
+        <button type="button" onClick={handleSearch}>
+          Search
+        </button>
       </div>
 
       <p>Books on this page: {books.length}</p>
